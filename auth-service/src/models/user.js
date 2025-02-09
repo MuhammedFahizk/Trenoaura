@@ -83,6 +83,7 @@ UserSchema.methods.generateAccessToken = function () {
       _id: user._id.toString(),
       username: `${user.username}`,
       email: user.email,
+      role: user.role,
     },
     ACCESS_TOKEN.secret,
     {
@@ -102,6 +103,7 @@ UserSchema.methods.generateRefreshToken = async function () {
   const refreshToken = jwt.sign(
     {
       _id: user._id.toString(),
+      role: user.role
     },
     REFRESH_TOKEN.secret,
     {
