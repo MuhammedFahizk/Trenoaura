@@ -1,20 +1,16 @@
-// src/utils/customError.js
+import { GraphQLError } from "graphql";
 
-class CustomError extends Error {
-  constructor(message, statusCode = 500, feedback = "") {
-    super(message);
-    this.name = "CustomError";
-    this.statusCode = statusCode;
-    this.feedback = feedback || message;
-  }
+class CustomError extends GraphQLError {
+  constructor(message, code = "INTERNAL_SERVER_ERROR", status = 500, feedback = "Something went wrong.") {
+    super(message, {
+      extensions: {
+        name: "CustomError",
+        code,
+        http: { status },
+        feedback,
+      },
+    });
 
-  toJSON() {
-    return {
-      error: this.name,
-      message: this.message,
-      statusCode: this.statusCode,
-      feedback: this.feedback,
-    };
   }
 }
 
