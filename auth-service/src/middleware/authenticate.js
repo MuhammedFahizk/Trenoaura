@@ -1,3 +1,5 @@
+import AuthError from "../config/errors/AuthError.js";
+
 export const authenticate = (resolver) => {
     return (parent, args, context, info) => {
       if (!context.user) {

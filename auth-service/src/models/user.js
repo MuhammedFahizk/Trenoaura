@@ -74,7 +74,10 @@ UserSchema.pre("save", async function (next) {
  */
 UserSchema.methods.generateAccessToken = function () {
   const user = this;
-
+    console.log(
+        "generateAccessToken: user:",
+    );
+    
   if (!ACCESS_TOKEN) {
     throw new Error("Access token secret is not defined");
   }
@@ -153,4 +156,56 @@ UserSchema.methods.comparePassword = async  function(candidatePassword)  {
   }
 };
 
+
+
+/* 
+5. VERIFY ACCESS TOKEN
+*/
+UserSchema.statics.verifyAccessToken = function (token) {
+    try {
+      if (!token) {
+        throw new CustomError(
+          "Access token is missing!",
+          "UNAUTHORIZED",
+          401,
+          "Please provide a valid access token."
+        );
+      }
+  
+      // Verify the access token
+      const decoded = jwt.verify(token, ACCESS_TOKEN.secret);
+      return decoded; // Return decoded user data
+    } catch (error) {
+      throw new CustomError(
+        "Invalid or expired access token!",
+        "TOKEN_EXPIRED",
+        403,
+        "Access token is not valid or has expired."
+      );
+    }
+  };
+  
+  /* 
+  6. VERIFY REFRESH TOKEN
+  */
+  UserSchema.statics.verifyRefreshToken = async function (token) {
+    try {
+     
+      const decoded = jwt.verify(token, REFRESH_TOKEN.secret);
+  
+      const user = await this.findOne({ _id: decoded._id, "tokens.token": token });
+  
+     
+  
+      return user;
+    } catch (error) {
+      throw new CustomError(
+        "Invalid or expired refresh token!",
+        "TOKEN_EXPIRED",
+        403,
+        "Refresh token is not valid or has expired."
+      );
+    }
+  };
+  
 export const User = model("User", UserSchema);

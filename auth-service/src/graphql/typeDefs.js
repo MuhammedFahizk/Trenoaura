@@ -16,6 +16,10 @@ export const typeDefs = gql`
     email: String
     role: String
   }
+
+  type RefreshTokenResponse {
+    accessToken: String!
+  }
   type Mutation {
     registerUser(
       userName: String!
@@ -23,6 +27,8 @@ export const typeDefs = gql`
       password: String!
       role: String
     ): authPayload
+
     signInUser(email: String!, password: String!): authPayload
+    refreshAccessToken(refreshToken: String!): RefreshTokenResponse!
   }
 `;

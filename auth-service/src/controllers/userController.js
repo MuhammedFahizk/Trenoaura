@@ -103,9 +103,97 @@ export const signInUser = async ({ email, password }) => {
     }
   };
   
-export const getProfile = async (_, args, { user }) => {
-  if (!user) {
-    throw new CustomError("Authentication required!", 401, "Please log in.");
+
+
+
+/**
+ * 2. 
+ * @function getProfile
+ * @description Fetches the authenticated user's profile
+ * @param {Object} user - The authenticated user object from context
+ * @returns {Object} - User profile data
+ * @throws {CustomError} - Throws a `CustomError` if user is not found
+ */
+export const getProfile = async (user) => {
+  try {
+    if (!user) {
+      throw new CustomError(
+        "Authentication required!",
+        "UNAUTHORIZED",
+        401,
+        "Please log in."
+      );
+    }
+
+    const foundUser = await User.findById(user.id).select("-password"); // Exclude password field
+
+    if (!foundUser) {
+      throw new CustomError(
+        "User not found!",
+        "NOT_FOUND",
+        404,
+        "Profile data not available."
+      );
+    }
+
+    return {
+      id: foundUser._id,
+      username: foundUser.username,
+      email: foundUser.email,
+    };
+  } catch (error) {
+    console.error("Error in getProfile:", error);
+    throw error instanceof CustomError ? error : new CustomError(
+      "Something went wrong while fetching the profile!",
+      "INTERNAL_SERVER_ERROR",
+      500,
+      error.message
+    );
   }
-  return getProfile(user.id);
 };
+
+
+
+/*
+.3 
+*/
+
+export const refreshAccessToken = async ( refreshToken ) => {
+    try {
+        if (!refreshToken) {
+            throw new CustomError(
+              "Refresh token is missing!",
+              "UNAUTHORIZED",
+              401,
+              "Please provide a valid refresh token."
+            );
+          }
+
+          const user = await User.verifyRefreshToken(refreshToken);
+
+          if (!user) {
+            throw new CustomError(
+              "Refresh token is invalid!",
+              "UNAUTHORIZED",
+              401,
+              "Please log in again."
+            );
+          }
+
+        const newAccessToken = user.generateAccessToken();
+        
+        return { accessToken: newAccessToken };
+
+    }
+    catch (error) {
+        console.error("Error in refreshAccessToken:", error);
+        throw error instanceof CustomError ? error : new CustomError(
+            "Something went wrong while generate access token !",
+            "INTERNAL_SERVER_ERROR",
+            500,
+            error.message
+          );
+        }
+    
+}
+ 
