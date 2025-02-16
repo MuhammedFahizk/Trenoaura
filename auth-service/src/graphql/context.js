@@ -19,7 +19,7 @@ export const authContext = ({ req } = {}) => {
     console.log("🔑 Extracted Token:", token);
 
     if (!process.env.AUTH_ACCESS_TOKEN_SECRET) {
-      console.error("❌ Missing JWT secret!");
+      // console.error("❌ Missing JWT secret!");
       throw new AuthError("Internal Server Error", "JWT secret is not configured.");
     }
 

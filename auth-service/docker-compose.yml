@@ -1,0 +1,29 @@
+services:
+  auth-service:
+    build: .
+    container_name: auth-service-container
+    restart: always
+    ports:
+      - "${HOST_PORT}:${CONTAINER_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - auth-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-container
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - auth-network
+
+networks:
+  auth-network:
+    driver: bridge

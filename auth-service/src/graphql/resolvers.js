@@ -15,6 +15,5 @@ export const resolvers = {
     registerUser: async (_, args) => registerUser(args),
     signInUser: async (_, args) => signInUser(args),
     refreshAccessToken: async (_, { refreshToken }) => refreshAccessToken(refreshToken),
-
   },
 };
